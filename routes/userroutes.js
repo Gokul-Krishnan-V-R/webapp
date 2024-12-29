@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 const JWT_SECRET = "123ABC";
 const express = require("express");
 userrouter.use(express.json());
+const {usermiddleware} = require("./../middilewares/usermiddileware")
 
     userrouter.post('/login', async (req, res)=>{
         const email = req.body.email;
@@ -56,12 +57,13 @@ userrouter.use(express.json());
 
     });
 
-    userrouter.get('/purchases',(req, res)=>{
+    userrouter.get('/purchases', usermiddleware, (req, res)=>{
         res.json({
             msg: "your purchases"
         })
     });
 
 module.exports = {
-    userrouter: userrouter 
+    userrouter: userrouter,
+    JWT_SECRET: JWT_SECRET
 }
