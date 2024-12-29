@@ -1,25 +1,42 @@
 
 const {Router} = require("express");
 const userrouter = Router();
-const {UserModel} = require("../../db")
+const {UserModel} = require("../db")
 const { default: mongoose, model } = require("mongoose");
-mongoose.connect("mongodb+srv://todoowner:rezFbNPR46yj0X0l@cluster0.7v223.mongodb.net/");
+const jwt = require("jsonwebtoken");
+const JWT_SECRET = "123ABC";
+const express = require("express");
+userrouter.use(express.json());
 
-    userrouter.post('/login', (req, res)=>{
-
-        res.json({
-            msg: "logged in"
+    userrouter.post('/login', async (req, res)=>{
+        const email = req.body.email;
+        const password = req.body.password;
+        const checkuser = await UserModel.findOne({
+            email: email,
+            password: password
         })
+       
+        if (checkuser){
+            let token = jwt.sign({id: checkuser._id.toString()}, JWT_SECRET);
+            res.json({
+            msg: "logged in",
+            token: token
+        })
+    }else{
+            res.status(401).json({
+                msg: "not authorized "
+            })
+        }
     });
 
     userrouter.post('/signup', async (req, res)=>{
         const email = req.body.email;
         const password = req.body.password;
         const username = req.body.username
-        const checkuser = UserModel.findOne({
-            email
+        const checkuser = await UserModel.findOne({
+            email: email
         })
-        if(checkuser.email==email){
+        if(checkuser){
             res.json({
                 msg:"User already Regstered"
             })
