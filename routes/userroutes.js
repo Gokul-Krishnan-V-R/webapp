@@ -4,7 +4,7 @@ const userrouter = Router();
 const {UserModel} = require("../db")
 const { default: mongoose, model } = require("mongoose");
 const jwt = require("jsonwebtoken");
-const JWT_SECRET = "123ABC";
+const JWT_USER = "123ABC";
 const express = require("express");
 userrouter.use(express.json());
 const {usermiddleware} = require("./../middilewares/usermiddileware")
@@ -22,7 +22,7 @@ const {z} = require("zod");
         if (checkuser){
             const checkpassword = await bcrypt.compare(password, checkuser.password);
            if(checkpassword){
-            let token = jwt.sign({id: checkuser._id.toString()}, JWT_SECRET);
+            let token = jwt.sign({id: checkuser._id.toString()}, JWT_USER);
             res.json({
             msg: "logged in",
             token: token
@@ -73,5 +73,5 @@ const {z} = require("zod");
 
 module.exports = {
     userrouter: userrouter,
-    JWT_SECRET: JWT_SECRET
+    JWT_USER: JWT_USER
 }
