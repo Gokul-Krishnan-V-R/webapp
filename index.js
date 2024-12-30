@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+require('dotenv').config()
 // const {CreateUserRoutes} = require("./routes/userroutes")
 // const {CreateAdminRoutes} = require("./routes/adminroutes")
 // const {CreateCourseRoutes} = require("./routes/courseroutes")
@@ -22,7 +23,7 @@ app.use("/admin", adminrouter)
 app.use("/course", courserouter)
 
 async function main(){
-await mongoose.connect("mongodb+srv://todoowner:rezFbNPR46yj0X0l@cluster0.7v223.mongodb.net/");
+await mongoose.connect(process.env.MONGO_URL);
 app.listen(3000);
 console.log("started the server @ 3000")
 }
