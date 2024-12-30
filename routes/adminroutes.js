@@ -1,13 +1,13 @@
 const {Router} = require("express");
 const adminrouter = Router();
-const {AdminModel} = require("./../db");
+const {AdminModel, CourseModel} = require("./../db");
 const { default: mongoose, model } = require("mongoose");
 const bcrypt = require("bcrypt");
 const express = require("express");
 adminrouter.use(express.json());
 const jwt = require("jsonwebtoken");
-const JWT_ADMIN = "123ZYSNCJ"
-
+const { JWT_ADMIN } = require("../config");
+const {adminmiddleware}= require("./../middilewares/adminmiddleware")
 adminrouter.post('/signup', async (req, res)=>{
     const email = req.body.email;
     const password = await bcrypt.hash(req.body.password, 10);
@@ -56,7 +56,20 @@ adminrouter.post('/signup', async (req, res)=>{
             })
         }
     });
-    adminrouter.post('/create', (req, res)=>{
+    adminrouter.post('/create', adminmiddleware, async(req, res)=>{
+        const {title, Description, price, imageurl} = req.body;
+        const adminId = req.userId;
+        const  course = await CourseModel.create({
+            title: title,
+            Description: Description,
+            price: price,
+            imageurl: imageurl,
+            creatorid: adminId
+        })
+        res.json({
+            msg: "Course Created Successfully",
+            course_id: course._id
+        })
 
     });
     adminrouter.put('/update', (req, res)=>{

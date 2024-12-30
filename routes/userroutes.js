@@ -4,12 +4,12 @@ const userrouter = Router();
 const {UserModel} = require("../db")
 const { default: mongoose, model } = require("mongoose");
 const jwt = require("jsonwebtoken");
-const JWT_USER = "123ABC";
 const express = require("express");
 userrouter.use(express.json());
 const {usermiddleware} = require("./../middilewares/usermiddileware")
 const bcrypt = require("bcrypt");
 const {z} = require("zod");
+const { JWT_USER } = require("../config");
 
 
     userrouter.post('/login', async (req, res)=>{
@@ -65,10 +65,18 @@ const {z} = require("zod");
 
     });
 
-    userrouter.get('/purchases', usermiddleware, (req, res)=>{
-        res.json({
-            msg: "your purchases"
+    userrouter.get('/purchases', usermiddleware, async (req, res)=>{
+        const userId = req.userId;
+        const user = await UserModel.findOne({
+            _id: userId
         })
+        if(user){res.json({
+            msg: "your purchases"
+        })}else{
+            res.status(401).json({
+                msg: "Who are you ...!"
+            })
+        }
     });
 
 module.exports = {

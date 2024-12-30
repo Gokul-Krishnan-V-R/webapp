@@ -1,28 +1,24 @@
 const {UserModel, AdminModel}  = require("./../db");
 const { default: mongoose, model } = require("mongoose");
 const jwt = require("jsonwebtoken");
-const JWT_SECRET = "123ABC";
+const { JWT_USER } = require("../config");
 
 
 
 async function usermiddleware(req, res, next){
-    const email = req.body.email;
-    const password = req.body.password;
+    // const email = req.body.email;
+    // const password = req.body.password;
     const token = req.headers.token;
-  try{ if(email == UserModel.findOne({email:email}) & jwt.verify(token, JWT_SECRET)){
-    next()
-   }
-   else{
-        res.json({
-            msg: "middleware verification unsuccessfull"
+    const decoded = jwt.verify(token, JWT_USER )
+    if(decoded){
+        req.userId = decoded.id;
+        next()
+    }else {
+        res.status(401).json({
+            msg: "auth failed"
         })
-   }
-}catch(e){
-    res.json({
-        msg:" some error "
-    })
-}
+    }
 }
 module.exports ={
-    usermiddleware
+    usermiddleware: usermiddleware
 }
