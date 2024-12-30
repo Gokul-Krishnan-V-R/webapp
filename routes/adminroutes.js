@@ -72,9 +72,33 @@ adminrouter.post('/signup', async (req, res)=>{
         })
 
     });
-    adminrouter.put('/update', (req, res)=>{
+    adminrouter.put('/update', adminmiddleware, async(req, res)=>{
+        const {title, Description, price, imageurl, course_id} = req.body;
+        const adminId = req.userId;
+        const  course = await CourseModel.updateOne({_id:course_id, creatorid: adminId},{
+            title: title,
+            Description: Description,
+            price: price,
+            imageurl: imageurl,
+            creatorid: adminId
+        })
+        res.json({
+            msg: "Course updated Successfully",
+            course_id: course._id
+        })
+
 
     });
+    adminrouter.get('/courses', adminmiddleware, async(req, res)=>{
+        const adminId= req.userId;
+        const  course = await CourseModel.find({
+            creatorid: adminId
+        });
+        res.json({
+            course,
+            course_id: course._id
+        })
+    })
 
 module.exports = {
     adminrouter: adminrouter
