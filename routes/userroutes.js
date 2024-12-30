@@ -8,21 +8,28 @@ const JWT_SECRET = "123ABC";
 const express = require("express");
 userrouter.use(express.json());
 const {usermiddleware} = require("./../middilewares/usermiddileware")
+const bcrypt = require("bcrypt");
+
 
     userrouter.post('/login', async (req, res)=>{
         const email = req.body.email;
         const password = req.body.password;
-        const checkuser = await UserModel.findOne({
-            email: email,
-            password: password
+         const checkuser = await UserModel.findOne({
+            email: email
         })
-       
+    
         if (checkuser){
+            const checkpassword = await bcrypt.compare(password, checkuser.password);
+           if(checkpassword){
             let token = jwt.sign({id: checkuser._id.toString()}, JWT_SECRET);
             res.json({
             msg: "logged in",
             token: token
-        })
+        })}else{
+            res.status(401).json({
+                msg: "who are you"
+            })
+        }
     }else{
             res.status(401).json({
                 msg: "not authorized "
@@ -32,7 +39,7 @@ const {usermiddleware} = require("./../middilewares/usermiddileware")
 
     userrouter.post('/signup', async (req, res)=>{
         const email = req.body.email;
-        const password = req.body.password;
+        const password = await bcrypt.hash(req.body.password, 10);
         const username = req.body.username
         const checkuser = await UserModel.findOne({
             email: email
