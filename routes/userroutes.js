@@ -1,7 +1,7 @@
 
 const {Router} = require("express");
 const userrouter = Router();
-const {UserModel} = require("../db")
+const {UserModel, PurchaseModel, CourseModel} = require("../db")
 const { default: mongoose, model } = require("mongoose");
 const jwt = require("jsonwebtoken");
 const express = require("express");
@@ -59,25 +59,39 @@ const { JWT_USER } = require("../config");
         res.json({
             msg: "signed up successfully"
         })}
-    });
+    }); 
 
-    userrouter.post('/purchase', (req, res)=>{
-
+    userrouter.post('/purchase', usermiddleware, async(req, res)=>{
+        const courseid= req.body.courseid;
+        const userId=req.userId;
+       // console.log("reached here")
+       console.log(userId)
+      //  console.log(courseid)
+        await PurchaseModel.create({
+            courseid,
+            userid: userId,
+        })
+        res.json({
+            msg: "you have successfully bought the course "
+        })
+        
     });
 
     userrouter.get('/purchases', usermiddleware, async (req, res)=>{
         const userId = req.userId;
-        const user = await UserModel.findOne({
-            _id: userId
+        const userpurchases = await PurchaseModel.find({
+            userid: userId,
         })
-        if(user){res.json({
-            msg: "your purchases"
-        })}else{
-            res.status(401).json({
-                msg: "Who are you ...!"
+        const coursedata = await CourseModel.find({
+            _id:{$in: userpurchases.map(x=>x.courseid)}
+        })
+            res.json({
+                msg: "purchases", 
+                userpurchases,
+                coursedata
             })
         }
-    });
+    );
 
 module.exports = {
     userrouter: userrouter,

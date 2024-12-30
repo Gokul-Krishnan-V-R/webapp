@@ -23,7 +23,6 @@ const courseschema = new Schema({
 })
 
 const purchaseschema = new Schema({
-    _id: ObjectId,
     courseid: ObjectId,
     userid: ObjectId
 })

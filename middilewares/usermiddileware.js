@@ -17,7 +17,7 @@ async function usermiddleware(req, res, next){
         res.status(401).json({
             msg: "auth failed"
         })
-    }
+    }                   
 }
 module.exports ={
     usermiddleware: usermiddleware
