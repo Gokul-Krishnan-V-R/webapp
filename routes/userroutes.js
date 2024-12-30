@@ -9,6 +9,7 @@ const express = require("express");
 userrouter.use(express.json());
 const {usermiddleware} = require("./../middilewares/usermiddileware")
 const bcrypt = require("bcrypt");
+const {z} = require("zod");
 
 
     userrouter.post('/login', async (req, res)=>{
